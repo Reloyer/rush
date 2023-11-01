@@ -6,6 +6,12 @@ import (
 	"net/http"
 )
 
+type GetReq struct {
+	url            string
+	authtoken      string
+	AdditionalArgs map[string]interface{}
+}
+
 func Get(url, authToken string) (*http.Response, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
