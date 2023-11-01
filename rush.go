@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	authToken := "2Wd1KUuqd9mrnecEFLjUNA"
-	url := "https://127.0.0.1:33043"
+	authToken := "UI9cT03SJ-BLs2Sokk-hzg"
+	url := "https://127.0.0.1:37849"
 	authToken = base64.StdEncoding.EncodeToString([]byte("riot:" + authToken))
 
 	uSumInfo, err := lcu.GetCurrentSummoner(url, authToken)

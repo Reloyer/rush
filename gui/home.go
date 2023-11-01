@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Reloyer/rush/lcu/api/types"
+	"github.com/Reloyer/rush/utility"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
@@ -28,15 +29,15 @@ func Activite(app *gtk.Application, sumsinfo types.Summoner, rankedstats types.R
 	title.SetXAlign(0)
 	title.SetYAlign(0)
 
-	log.Println(fmt.Sprintf("assets/profileIcons/%i.jpg", sumsinfo.ProfileIconId))
-	image := gtk.NewImageFromFile(("assets/profileIcons/" + strconv.Itoa(sumsinfo.ProfileIconId) + ".jpg")) // Replace with your image path
+	log.Println(fmt.Sprintf("./assets/profileIcons/%d.jpg", sumsinfo.ProfileIconId))
+	profileIconImage := gtk.NewImageFromFile(("./assets/profileIcons/" + strconv.Itoa(sumsinfo.ProfileIconId) + ".jpg"))
 
-	soloqRankImage := gtk.NewImageFromFile(fmt.Sprintf("assets/rankedIcons/%s%d.png", strings.ToLower(rankedstats.Queues[0].Tier), rankedstats.Queues[0].Division))
-	flexRankImage := gtk.NewImageFromFile(fmt.Sprintf("assets/rankedIcons/%s%d.png", strings.ToLower(rankedstats.Queues[1].Tier), rankedstats.Queues[1].Division))
+	soloqRankImage := gtk.NewImageFromFile(fmt.Sprintf("./assets/rankedIcons/%s%d.png", strings.ToLower(rankedstats.Queues[0].Tier), utility.DivisonToDec(rankedstats.Queues[0].Division)))
+	flexRankImage := gtk.NewImageFromFile(fmt.Sprintf("./assets/rankedIcons/%s%d.png", strings.ToLower(rankedstats.Queues[1].Tier), utility.DivisonToDec(rankedstats.Queues[1].Division)))
 
 	box := gtk.NewBox(gtk.OrientationVertical, 0)
 	box.Append(title)
-	box.Append(image) // Add the image to the box
+	box.Append(profileIconImage) // Add the image to the box
 	box.Append(soloqRankImage)
 	box.Append(flexRankImage)
 
