@@ -3,11 +3,10 @@ package gui
 import (
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 
-	"github.com/Reloyer/rush/lcu/api/types"
-	"github.com/Reloyer/rush/utility"
+	"github.com/Reloyer/rush/dataservice"
+	"github.com/Reloyer/rush/gui/widgets"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
@@ -15,25 +14,32 @@ import (
 
 var styleCSS string
 
-func Activite(app *gtk.Application, sumsinfo types.Summoner, rankedstats types.Ranked) {
+func ShowHomePage(window *gtk.ApplicationWindow, ds *dataservice.DataService) {
 
 	gtk.StyleContextAddProviderForDisplay(
 		gdk.DisplayGetDefault(), loadCSS(styleCSS),
 		gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
 	)
 
-	title := gtk.NewLabel(fmt.Sprintf("%s", sumsinfo.DisplayName))
+	showHomePage := func() {
+		ShowHomePage(window, ds)
+	}
+	showSettingsPage := func() {
+		ShowSettingsPage(window, ds)
+	}
+	widgets.CreateNavBar(window, showHomePage, showSettingsPage)
+
+	title := gtk.NewLabel(fmt.Sprintf("%s", ds.Homedata.Nickname))
 	title.AddCSSClass("title")
 	title.SetWrap(true)
 	title.SetWrapMode(pango.WrapWordChar)
 	title.SetXAlign(0)
 	title.SetYAlign(0)
 
-	log.Println(fmt.Sprintf("./assets/profileIcons/%d.jpg", sumsinfo.ProfileIconId))
-	profileIconImage := gtk.NewImageFromFile(("./assets/profileIcons/" + strconv.Itoa(sumsinfo.ProfileIconId) + ".jpg"))
+	profileIconImage := gtk.NewImageFromFile(ds.Homedata.ProfileIcon)
 
-	soloqRankImage := gtk.NewImageFromFile(fmt.Sprintf("./assets/rankedIcons/%s%d.png", strings.ToLower(rankedstats.Queues[0].Tier), utility.DivisonToDec(rankedstats.Queues[0].Division)))
-	flexRankImage := gtk.NewImageFromFile(fmt.Sprintf("./assets/rankedIcons/%s%d.png", strings.ToLower(rankedstats.Queues[1].Tier), utility.DivisonToDec(rankedstats.Queues[1].Division)))
+	soloqRankImage := gtk.NewImageFromFile(ds.Homedata.SoloqIcon)
+	flexRankImage := gtk.NewImageFromFile(ds.Homedata.FlexqIcon)
 
 	box := gtk.NewBox(gtk.OrientationVertical, 0)
 	box.Append(title)
@@ -41,12 +47,9 @@ func Activite(app *gtk.Application, sumsinfo types.Summoner, rankedstats types.R
 	box.Append(soloqRankImage)
 	box.Append(flexRankImage)
 
-	window := gtk.NewApplicationWindow(app)
-	window.SetTitle("Anti-browser")
+	window.SetTitle("Rush")
 	window.SetChild(box)
 	window.SetTitlebar(gtk.NewBox(gtk.OrientationVertical, 0)) // hide headerbar
-	window.SetDefaultSize(400, 300)
-	window.Show()
 
 }
 func loadCSS(content string) *gtk.CSSProvider {

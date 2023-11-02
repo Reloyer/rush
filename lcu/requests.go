@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
-	"github.com/Reloyer/rush/lcu/api/endpoints"
-	"github.com/Reloyer/rush/lcu/api/types"
+	"github.com/Reloyer/rush/lcu/datatypes"
+	"github.com/Reloyer/rush/lcu/endpoints"
 )
 
 type GetReq struct {
@@ -17,9 +18,18 @@ type GetReq struct {
 }
 
 func getRequest(g GetReq) (*http.Response, error) {
-	for key, value := range g.AdditionalArgs {
-		g.URL += fmt.Sprintf("&%s=%v", key, value)
+	u, err := url.Parse(g.URL)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing URL: %s", err)
 	}
+
+	q := u.Query()
+	for key, value := range g.AdditionalArgs {
+		q.Set(key, fmt.Sprintf("%v", value))
+	}
+	u.RawQuery = q.Encode()
+	g.URL = u.String()
+
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -40,7 +50,7 @@ func getRequest(g GetReq) (*http.Response, error) {
 	return response, nil
 }
 
-func GetCurrentSummoner(url string, authToken string) (summ types.Summoner, err error) {
+func GetCurrentSummoner(url string, authToken string) (summ datatypes.Summoner, err error) {
 	url = endpoints.GetCurrentSummoner(url)
 	g := GetReq{
 		URL:       url,
@@ -48,23 +58,23 @@ func GetCurrentSummoner(url string, authToken string) (summ types.Summoner, err 
 	}
 	response, err := getRequest(g)
 	if err != nil {
-		return types.Summoner{}, err
+		return datatypes.Summoner{}, err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return types.Summoner{}, fmt.Errorf("request failed with status: %s", response.Status)
+		return datatypes.Summoner{}, fmt.Errorf("request failed with status: %s", response.Status)
 	}
 
 	err = json.NewDecoder(response.Body).Decode(&summ)
 	if err != nil {
-		return types.Summoner{}, fmt.Errorf("error decoding JSON: %s", err)
+		return datatypes.Summoner{}, fmt.Errorf("error decoding JSON: %s", err)
 	}
 
 	return summ, nil
 }
 
-func GetCurrentRankedStats(url string, authToken string) (rank types.Ranked, err error) {
+func GetCurrentRankedStats(url string, authToken string) (rank datatypes.Ranked, err error) {
 	url = endpoints.GetCurrentRankedStats(url)
 	g := GetReq{
 		URL:       url,
@@ -72,47 +82,46 @@ func GetCurrentRankedStats(url string, authToken string) (rank types.Ranked, err
 	}
 	response, err := getRequest(g)
 	if err != nil {
-		return types.Ranked{}, err
+		return datatypes.Ranked{}, err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return types.Ranked{}, fmt.Errorf("request failed with status: %s", response.Status)
+		return datatypes.Ranked{}, fmt.Errorf("request failed with status: %s", response.Status)
 	}
 
 	err = json.NewDecoder(response.Body).Decode(&rank)
 	if err != nil {
-		return types.Ranked{}, fmt.Errorf("error decoding JSON: %s", err)
+		return datatypes.Ranked{}, fmt.Errorf("error decoding JSON: %s", err)
 	}
 
 	return rank, nil
 }
-func GetCurrentSummonerMatches(url string, authToken string, puuid int, begIndex int, endIndex int) (matches types.Matches, err error) {
+func GetCurrentSummonerMatches(url string, authToken string, begIndex int, endIndex int) (matchHistory datatypes.MatchHistory, err error) {
 	url = endpoints.GetCurrentSummonerMatches(url)
 	req := GetReq{
 		URL:       url,
 		AuthToken: authToken,
 		AdditionalArgs: map[string]interface{}{
-			"PUUID":    puuid,
-			"BegIndex": begIndex,
-			"EndIndex": endIndex,
+			"begIndex": begIndex,
+			"endIndex": endIndex,
 		},
 	}
 
 	response, err := getRequest(req)
 	if err != nil {
-		return types.Matches{}, err
+		return datatypes.MatchHistory{}, err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return types.Matches{}, fmt.Errorf("request failed with status: %s", response.Status)
+		return datatypes.MatchHistory{}, fmt.Errorf("request failed with status: %s", response.Status)
 	}
-	err = json.NewDecoder(response.Body).Decode(&matches)
+	err = json.NewDecoder(response.Body).Decode(&matchHistory)
 
 	if err != nil {
-		return types.Matches{}, fmt.Errorf("error decoding JSON: %s", err)
+		return datatypes.MatchHistory{}, fmt.Errorf("error decoding JSON: %s", err)
 	}
 
-	return matches, nil
+	return matchHistory, nil
 }
