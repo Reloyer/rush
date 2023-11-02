@@ -1,0 +1,26 @@
+@define-color borders rgb(118, 118, 118);
+
+.color-0 { color: #595b5a; }
+.color-1 { color: #14c3a2; }
+.color-2 { color: #0de5a8; }
+.color-3 { color: #7cf49a; }
+.color-4 { color: #b8fd99; }
+
+window {
+	background-color: #595b5a;
+	color: #7cf49a;
+	font-family: "Fira Code", bold, monospace;
+	font-size: large;
+	padding: 8px;
+	box-shadow: none;
+	border: 0px solid @borders;
+	border-radius: 0;
+}
+.title{
+    font-size: x-large;
+}
+.subtitle{
+    font-size:  xx-large;
+    color: #7cf49a;
+    border-color: white;
+}

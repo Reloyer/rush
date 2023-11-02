@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"log"
 	"os"
 
@@ -13,47 +12,31 @@ import (
 )
 
 func main() {
-	//configFilePath := "config/config.ini" // specify the path to your config file
-	//config, err := config.LoadConfig(configFilePath)
-	authToken := "SPDiRasq2QFkmlVg8XPtVg"
-	url := "https://127.0.0.1:34037"
-	authToken = base64.StdEncoding.EncodeToString([]byte("riot:" + authToken))
 
-	userSummonerInfo, err := lcu.GetCurrentSummoner(url, authToken)
+	lockfile, err := lcu.NewLockfile("/home/Reloyer/Games/wine/prefix/drive_c/Riot Games/League of Legends/lockfile")
+	if err != nil {
+		log.Println(err)
+	}
+
+	userSummonerInfo, err := lcu.GetCurrentSummoner(lockfile.Url(), lockfile.TokenEncoded())
 
 	if err != nil {
 		log.Fatal("Error getting current summoner:", err)
 	}
 
-	userRankedStats, err := lcu.GetCurrentRankedStats(url, authToken)
+	userRankedStats, err := lcu.GetCurrentRankedStats(lockfile.Url(), lockfile.TokenEncoded())
 	if err != nil {
 		log.Fatal("Error getting current summoner:", err)
 	}
-	//userMatches, err := lcu.GetCurrentSummonerMatches(url, authToken, 0, 10)
+	userMatches, err := lcu.GetCurrentSummonerMatches(lockfile.Url(), lockfile.TokenEncoded(), 0, 10)
 
+	log.Println(userMatches.Games.Games[4].Participants[0].Stats.Item2)
 	ds := dataservice.NewDataService()
 	ds.GetHomePageData(userSummonerInfo, userRankedStats)
-	/*userTier := rankstats.Queues[0].Tier
-	userDivison := rankstats.Queues[0].Division
-	userSoloqWins := rankstats.Queues[0].Wins
-	userSoloqLoses := rankstats.Queues[0].Losses
 
-	log.Println(rankstats.Queues[0].Tier, rankstats.Queues[0].Division)
-	log.Println(iconURL)
-	log.Println(rankURL)
-	*/
 	app := gtk.NewApplication("com.github.Reloyer.rush", gio.ApplicationFlagsNone)
-	app.Connect("activate", func() {
-		win := gtk.NewApplicationWindow(app)
+	app.ConnectActivate((func() { gui.Activite(app, ds) }))
 
-		win.SetTitle("Rush")
-		win.SetDefaultSize(400, 300)
-
-		// Call the ShowHomePage function here
-		gui.ShowHomePage(win, ds)
-
-		win.Show()
-	})
 	if code := app.Run(os.Args); code > 0 {
 		os.Exit(code)
 	}
