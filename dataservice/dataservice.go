@@ -27,6 +27,9 @@ type HomeData struct {
 	FlexqGames   string
 	FlexqWR      string
 }
+
+type GameData struct {
+}
 type SettingsData struct {
 	Lockfile      string
 	WindowsWidth  int
@@ -35,6 +38,7 @@ type SettingsData struct {
 }
 type DataService struct {
 	Homedata HomeData
+	Gamedata GameData
 }
 
 func NewDataService() *DataService {

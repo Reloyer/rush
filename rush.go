@@ -30,7 +30,7 @@ func main() {
 	}
 	userMatches, err := lcu.GetCurrentSummonerMatches(lockfile.Url(), lockfile.TokenEncoded(), 0, 10)
 
-	log.Println(userMatches.Games.Games[4].Participants[0].Stats.Item2)
+	log.Println(userMatches.Games.Game[4].Participants[0].Stats.Item2)
 	ds := dataservice.NewDataService()
 	ds.GetHomePageData(userSummonerInfo, userRankedStats)
 

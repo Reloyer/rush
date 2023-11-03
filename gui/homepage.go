@@ -8,6 +8,7 @@ import (
 
 	"github.com/Reloyer/rush/config"
 	"github.com/Reloyer/rush/dataservice"
+	"github.com/Reloyer/rush/gui/widgets"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
@@ -61,6 +62,8 @@ func Activite(app *gtk.Application, ds *dataservice.DataService) {
 	grid.Attach(flexqRankImage, 0, 6, 2, 2)
 	grid.Attach(l_flexqstats, 2, 6, 2, 2)
 
+	match := widgets.NewGame()
+
 	cfg, err := config.LoadConfig("./config/config.ini")
 	if err != nil {
 		log.Fatal("fatal error")
@@ -68,7 +71,7 @@ func Activite(app *gtk.Application, ds *dataservice.DataService) {
 
 	window := gtk.NewApplicationWindow(app)
 	window.SetTitle("Rush")
-	window.SetChild(grid)
+	window.SetChild(match)
 	window.SetDefaultSize(cfg.WindowWidth, cfg.WindowHeight)
 	window.Show()
 }

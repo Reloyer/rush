@@ -12,7 +12,7 @@ type Games struct {
 	GameEndDate    string `json:"gameEndDate"`
 	GameIndexBegin int    `json:"gameIndexBegin"`
 	GameIndexEnd   int    `json:"gameIndexEnd"`
-	Games          []Game `json:"games"`
+	Game           []Game `json:"games"`
 }
 
 type Game struct {
