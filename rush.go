@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -30,10 +31,12 @@ func main() {
 	}
 	userMatches, err := lcu.GetCurrentSummonerMatches(lockfile.Url(), lockfile.TokenEncoded(), 0, 10)
 
-	log.Println(userMatches.Games.Game[4].Participants[0].Stats.Item2)
+	log.Println(userMatches.Games.Game[0].Participants[0].Stats.Item0)
 	ds := dataservice.NewDataService()
 	ds.GetHomePageData(userSummonerInfo, userRankedStats)
+	ds.GetGameData(userMatches.Games.Game[4], userSummonerInfo)
 
+	fmt.Println(string([]byte(ds.Gamedata.GameDate)))
 	app := gtk.NewApplication("com.github.Reloyer.rush", gio.ApplicationFlagsNone)
 	app.ConnectActivate((func() { gui.Activite(app, ds) }))
 

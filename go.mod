@@ -7,7 +7,10 @@ require (
 	github.com/gorilla/websocket v1.5.0
 )
 
-require github.com/stretchr/testify v1.8.4 // indirect
+require (
+	github.com/diamondburned/gotk4 v0.0.4 // indirect
+	github.com/stretchr/testify v1.8.4 // indirect
+)
 
 require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20230221090011-e4bae7ad2296 // indirect

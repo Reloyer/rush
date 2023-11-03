@@ -1,4 +1,6 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+github.com/diamondburned/gotk4 v0.0.4 h1:iydA0c/GFShyYG1iJuOHyzbyyIcxsdqjv4yucIi2UXE=
+github.com/diamondburned/gotk4 v0.0.4/go.mod h1:9hxaIotfin2jWlJxPUY1lRdslPPqhZ3OPJWatywKCh4=
 github.com/diamondburned/gotk4/pkg v0.0.5 h1:1NOpwNttT63zJdRItwf79ZyX6Bw2bkv8+YjfZCUevcc=
 github.com/diamondburned/gotk4/pkg v0.0.5/go.mod h1:Jr5xzUuGyLsoMtE9LzE/Lay1gD0ONiFWAmQ0+Z6KLeA=
 github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWmnc=

@@ -5,15 +5,15 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func NewGame(ds dataservice.HomeData) *gtk.Box {
+func NewGame(ds dataservice.GameData) *gtk.Box {
 	mainBox := gtk.NewBox(gtk.OrientationHorizontal, 6)
 
 	b_gameInfo := gtk.NewBox(gtk.OrientationVertical, 2)
 
-	l_gameMode := gtk.NewLabel("GameMode")
-	l_gameDate := gtk.NewLabel("GameDate")
-	l_gameResult := gtk.NewLabel("GameResult")
-	l_gameDuration := gtk.NewLabel("GameDuration")
+	l_gameMode := gtk.NewLabel(ds.GameMode)
+	l_gameDate := gtk.NewLabel(ds.GameDate)
+	l_gameResult := gtk.NewLabel(ds.GameResult)
+	l_gameDuration := gtk.NewLabel(ds.GameDuration)
 
 	b_gameInfo.Append(l_gameMode)
 	b_gameInfo.Append(l_gameDate)
@@ -23,7 +23,7 @@ func NewGame(ds dataservice.HomeData) *gtk.Box {
 	b_userOverview := gtk.NewBox(gtk.OrientationHorizontal, 2)
 
 	b_userInfo := gtk.NewBox(gtk.OrientationVertical, 2)
-	i_userChampion := gtk.NewImage()
+	i_userChampion := gtk.NewImageFromFile(ds.UserChampionIcon)
 
 	b_userSummonerSpells := gtk.NewBox(gtk.OrientationVertical, 2)
 
@@ -56,21 +56,21 @@ func NewGame(ds dataservice.HomeData) *gtk.Box {
 
 	b_userBuild := gtk.NewBox(gtk.OrientationHorizontal, 1)
 
-	i_item1 := gtk.NewImage()
-	i_item2 := gtk.NewImage()
-	i_item3 := gtk.NewImage()
-	i_item4 := gtk.NewImage()
-	i_item5 := gtk.NewImage()
-	i_item6 := gtk.NewImage()
-	i_trinket := gtk.NewImage()
+	i_item0 := gtk.NewImageFromFile(ds.ItemIcon0)
+	i_item1 := gtk.NewImageFromFile(ds.ItemIcon1)
+	i_item2 := gtk.NewImageFromFile(ds.ItemIcon2)
+	i_item3 := gtk.NewImageFromFile(ds.ItemIcon3)
+	i_item4 := gtk.NewImageFromFile(ds.ItemIcon4)
+	i_item5 := gtk.NewImageFromFile(ds.ItemIcon5)
+	i_item6 := gtk.NewImageFromFile(ds.ItemIcon6)
 
+	b_userBuild.Append(i_item0)
 	b_userBuild.Append(i_item1)
 	b_userBuild.Append(i_item2)
 	b_userBuild.Append(i_item3)
 	b_userBuild.Append(i_item4)
 	b_userBuild.Append(i_item5)
 	b_userBuild.Append(i_item6)
-	b_userBuild.Append(i_trinket)
 
 	b_userOverview.Append(b_userInfo)
 	b_userOverview.Append(b_userBuild)

@@ -62,8 +62,7 @@ func Activite(app *gtk.Application, ds *dataservice.DataService) {
 	grid.Attach(flexqRankImage, 0, 6, 2, 2)
 	grid.Attach(l_flexqstats, 2, 6, 2, 2)
 
-	match := widgets.NewGame()
-
+	match := widgets.NewGame(ds.Gamedata)
 	cfg, err := config.LoadConfig("./config/config.ini")
 	if err != nil {
 		log.Fatal("fatal error")
