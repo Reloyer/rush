@@ -60,14 +60,14 @@ func NewDataService() *DataService {
 func (ds *DataService) GetHomePageData(s datatypes.Summoner, r datatypes.Ranked) {
 	assetsDir := "./assets"
 	profileIconsDir := assetsDir + "/profile-icons"
-	rankIconsDir := assetsDir + "/rank-icons"
+	rankIconsDir := assetsDir + "/ranked-icons"
 
 	hd := &ds.Homedata
 	hd.Nickname = s.DisplayName
 	hd.Level = fmt.Sprintf("%d", s.SummonerLevel)
 	hd.ProfileIcon = fmt.Sprintf("%s/%d.png", profileIconsDir, s.ProfileIconId)
 
-	hd.SoloqIcon = fmt.Sprintf("%s%s/%d.png", rankIconsDir, strings.ToLower(r.Queues[0].Tier), utility.DivisonToDec(r.Queues[0].Division))
+	hd.SoloqIcon = fmt.Sprintf("%s/%s%d.png", rankIconsDir, strings.ToLower(r.Queues[0].Tier), utility.DivisonToDec(r.Queues[0].Division))
 	hd.SoloqTier = r.Queues[0].Tier
 	hd.SoloqDivison = r.Queues[0].Division
 	hd.SoloqWins = fmt.Sprintf("%d", r.Queues[0].Wins)
@@ -75,7 +75,7 @@ func (ds *DataService) GetHomePageData(s datatypes.Summoner, r datatypes.Ranked)
 	hd.SoloqGames = fmt.Sprintf("%d", (r.Queues[0].Wins + r.Queues[0].Losses))
 	hd.SoloqWR = fmt.Sprintf("%d", (r.Queues[0].Wins+r.Queues[0].Losses)/r.Queues[0].Wins*10)
 
-	hd.FlexqIcon = fmt.Sprintf("%s%s/%d.png", rankIconsDir, strings.ToLower(r.Queues[1].Tier), utility.DivisonToDec(r.Queues[1].Division))
+	hd.FlexqIcon = fmt.Sprintf("%s/%s%d.png", rankIconsDir, strings.ToLower(r.Queues[1].Tier), utility.DivisonToDec(r.Queues[1].Division))
 	hd.FlexqTier = r.Queues[1].Tier
 	hd.FlexqDivison = r.Queues[1].Division
 	hd.FlexqWins = fmt.Sprintf("%d", r.Queues[1].Wins)
