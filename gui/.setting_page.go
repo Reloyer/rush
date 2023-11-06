@@ -21,7 +21,7 @@ func ShowSettingsPage(window *gtk.ApplicationWindow, ds *dataservice.DataService
 	title := gtk.NewLabel(fmt.Sprintf("%s", ds.Homedata.Nickname))
 	title.AddCSSClass("title")
 	title.SetWrap(true)
-	title.SetWrapMode(pango.WrapWordChar)
+	title.SetWrapMode(pango.WrapWordCha
 	title.SetXAlign(0)
 	title.SetYAlign(0)
 

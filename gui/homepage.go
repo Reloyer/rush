@@ -2,32 +2,17 @@ package gui
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"strings"
 
-	"github.com/Reloyer/rush/config"
 	"github.com/Reloyer/rush/dataservice"
+	"github.com/Reloyer/rush/gui/widgets"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-type HomePage struct {
-}
-
-var styleCSS string
-
-func Activite(app *gtk.Application, ds *dataservice.DataService) {
-	b, err := os.ReadFile("./gui/homepage.css") // just pass the file name
-	if err != nil {
-		fmt.Print(err)
-	}
-	styleCSS = string(b)
-	gtk.StyleContextAddProviderForDisplay(
-		gdk.DisplayGetDefault(), loadCSS(styleCSS),
-		gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
-	)
-
+func ShowHomePage(w *gtk.ApplicationWindow, ds *dataservice.DataService) {
+	ChangeDisplayStyleProvider(gdk.DisplayGetDefault(), "Home", gtk.STYLE_PROVIDER_PRIORITY_APPLICATION, CSSProviders)
+	gtk.StyleContextAddProviderForDisplay(gdk.DisplayGetDefault(), CSSProviders["Home"], gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+	widgets.CreateNavBar(w, ds, ShowHomePage, ShowMatchHistoryPage)
 	grid := gtk.NewGrid()
 	grid.SetColumnSpacing(6)
 	grid.SetRowSpacing(6)
@@ -61,26 +46,5 @@ func Activite(app *gtk.Application, ds *dataservice.DataService) {
 	grid.Attach(flexqRankImage, 0, 6, 2, 2)
 	grid.Attach(l_flexqstats, 2, 6, 2, 2)
 
-	cfg, err := config.LoadConfig("./config/config.ini")
-	if err != nil {
-		log.Fatal("fatal error")
-	}
-
-	window := gtk.NewApplicationWindow(app)
-	window.SetTitle("Rush")
-	window.SetChild(grid)
-	window.SetDefaultSize(cfg.WindowWidth, cfg.WindowHeight)
-	window.Show()
-}
-
-func loadCSS(content string) *gtk.CSSProvider {
-	prov := gtk.NewCSSProvider()
-	prov.ConnectParsingError(func(sec *gtk.CSSSection, err error) {
-		// Optional line parsing routine.
-		loc := sec.StartLocation()
-		lines := strings.Split(content, "\n")
-		log.Printf("CSS error (%v) at line: %q", err, lines[loc.Lines()])
-	})
-	prov.LoadFromData(content)
-	return prov
+	w.SetChild(grid)
 }

@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -97,8 +98,9 @@ func GetCurrentRankedStats(url string, authToken string) (rank datatypes.Ranked,
 
 	return rank, nil
 }
-func GetCurrentSummonerMatches(url string, authToken string, begIndex int, endIndex int) (matchHistory datatypes.MatchHistory, err error) {
-	url = endpoints.GetCurrentSummonerMatches(url)
+
+func GetCurrentSummonerMatchHistory(url string, authToken string, begIndex int, endIndex int) (matchHistory datatypes.MatchHistory, err error) {
+	url = endpoints.GetCurrentSummonerMatchHistory(url)
 	req := GetReq{
 		URL:       url,
 		AuthToken: authToken,
@@ -117,11 +119,35 @@ func GetCurrentSummonerMatches(url string, authToken string, begIndex int, endIn
 	if response.StatusCode != http.StatusOK {
 		return datatypes.MatchHistory{}, fmt.Errorf("request failed with status: %s", response.Status)
 	}
-	err = json.NewDecoder(response.Body).Decode(&matchHistory)
 
+	err = json.NewDecoder(response.Body).Decode(&matchHistory)
 	if err != nil {
 		return datatypes.MatchHistory{}, fmt.Errorf("error decoding JSON: %s", err)
 	}
 
 	return matchHistory, nil
+}
+func GetGame(url string, authToken string, gameId int) (game datatypes.Game, err error) {
+	url = endpoints.GetGame(url) + fmt.Sprintf("%d", gameId)
+	req := GetReq{
+		URL:       url,
+		AuthToken: authToken,
+	}
+	response, err := getRequest(req)
+	if err != nil {
+		return datatypes.Game{}, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		log.Println(err)
+		return datatypes.Game{}, err
+	}
+
+	err = json.NewDecoder(response.Body).Decode(&game)
+
+	if err != nil {
+		return datatypes.Game{}, err
+	}
+	return game, nil
 }

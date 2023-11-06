@@ -1,0 +1,57 @@
+@define-color background #595b5a;
+@define-color font #C6E0FF;
+@define-color label-color #0de5a8;
+@define-color widget #7cf49a; 
+@define-color color-4 #b8fd99;
+
+window {
+	background-color:  @background;
+	color: #121715;
+	font-family: serif;
+	font-size: 1em;
+	padding: 8px;
+}
+* {
+	border: none;
+	outline-style: none;
+}
+.perk-image{
+	outline-style: solid;
+	outline-color: black;
+}
+.summmonerspell-image{
+	outline-style: solid;
+	outline-color: black;
+}
+.item-image{
+	outline-style: solid;
+	outline-color: black;
+}
+.gamebox{
+	outline-style: solid;
+	outline-color: black;
+}
+.item{
+	outline-style: none;
+}
+.gamebox-won{
+	background-color: #4AA96C;
+}
+.gamebox-lost{
+	background-color: #F55C47;
+}
+.gamebox-unknown{
+	background-color: grey;
+}
+.gamebox-kda-superior {
+	color: #F5B700;
+}
+.gamebox-kda-good {
+	color: #758BFD;
+}
+.gamebox-kda-normal {
+	color:  #1f1c1c;
+}
+.gamebox-kda-bad {
+	color: #ff0000;
+}

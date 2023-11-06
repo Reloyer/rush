@@ -2,7 +2,9 @@ package dataservice
 
 import (
 	"fmt"
+	"log"
 	"strings"
+	"time"
 
 	"github.com/Reloyer/rush/lcu/datatypes"
 	"github.com/Reloyer/rush/utility"
@@ -27,22 +29,55 @@ type HomeData struct {
 	FlexqGames   string
 	FlexqWR      string
 }
-
-type GameData struct {
-	GameMode         string
-	GameDate         string
-	GameResult       string
-	GameDuration     string
-	UserChampionID   string
-	UserChampionIcon string
-	ItemIcon0        string
-	ItemIcon1        string
-	ItemIcon2        string
-	ItemIcon3        string
-	ItemIcon4        string
-	ItemIcon5        string
-	ItemIcon6        string
+type Player struct {
+	Nickname     string
+	ChampionIcon string
 }
+type GameData struct {
+	UserInedx          int
+	GameType           string
+	TimeSince          string
+	GameResult         string
+	GameDuration       string
+	UserNickName       string
+	UserChampionID     string
+	UserChampionIcon   string
+	UserKDA            string
+	UserKDAPerfect     bool
+	UserKDASuperior    bool
+	UserKDAGood        bool
+	UserKDANormal      bool
+	UserKDABad         bool
+	UserRatio          string
+	ItemsIcons         []string
+	Perk0Icon          string
+	PerkSubStyleIcon   string
+	SummonerSpell1Icon string
+	SummonerSpell2Icon string
+	NumberOfPlayer     int
+	Team1              []Player
+	Team2              []Player
+}
+type MatchHistoryData struct {
+	MatchHistory datatypes.MatchHistory
+	Gamedata     []GameData
+	UserNickName string
+}
+
+var gameType = map[int]string{
+	0:   "Custom Game",
+	400: "Normal (Draft Pick)",
+	420: "Ranked Solo",
+	430: "Normal (Blind Pick)",
+	440: "Ranked Flex",
+	450: "Aram",
+	700: "Clash",
+	720: "Clash Aram",
+	830: "Co-op vs AI (Intro)",
+	840: "Co-op vs AI (Beginner)",
+	850: "Co-op vs AI (Advanced)",
+}
+
 type SettingsData struct {
 	Lockfile      string
 	WindowsWidth  int
@@ -50,8 +85,8 @@ type SettingsData struct {
 	Language      string
 }
 type DataService struct {
-	Homedata HomeData
-	Gamedata GameData
+	Homedata         HomeData
+	MatchHistorydata MatchHistoryData
 }
 
 func NewDataService() *DataService {
@@ -65,7 +100,7 @@ func (ds *DataService) GetHomePageData(s datatypes.Summoner, r datatypes.Ranked)
 	hd := &ds.Homedata
 	hd.Nickname = s.DisplayName
 	hd.Level = fmt.Sprintf("%d", s.SummonerLevel)
-	hd.ProfileIcon = fmt.Sprintf("%s/%d.png", profileIconsDir, s.ProfileIconId)
+	hd.ProfileIcon = fmt.Sprintf("%s/%d.jpg", profileIconsDir, s.ProfileIconId)
 
 	hd.SoloqIcon = fmt.Sprintf("%s/%s%d.png", rankIconsDir, strings.ToLower(r.Queues[0].Tier), utility.DivisonToDec(r.Queues[0].Division))
 	hd.SoloqTier = r.Queues[0].Tier
@@ -83,36 +118,99 @@ func (ds *DataService) GetHomePageData(s datatypes.Summoner, r datatypes.Ranked)
 	hd.FlexqGames = fmt.Sprintf("%d", (r.Queues[1].Wins + r.Queues[1].Losses))
 	hd.FlexqWR = fmt.Sprintf("%d", (r.Queues[1].Wins+r.Queues[1].Losses)/r.Queues[1].Wins*10)
 }
-func (ds *DataService) GetGameData(g datatypes.Game, s datatypes.Summoner) {
+func (ds *DataService) GetGameData(g datatypes.Game, s datatypes.Summoner) GameData {
 	assetsDir := "./assets"
 	championIcons := assetsDir + "/champion-icons"
 	itemsIcons := assetsDir + "/items-icons"
+	perkIcons := assetsDir + "/perk-icons"
+	summonerIcons := assetsDir + "/summoners-icons"
 
-	i := 0
-	userIndex := 0
-	for i < len(g.Participants) {
-		if g.Participants[i].ParticipantId == s.SummonerId {
-			userIndex = i
+	userId := -1
+
+	for i, participant := range g.ParticipantIdentities {
+		if participant.Player.SummonerName == s.DisplayName {
+			userId = i
 		}
-		i++
 	}
-	gd := &ds.Gamedata
-	gd.GameMode = g.GameMode
-	gd.GameDate = g.GameCreationDate
-	gd.GameDuration = fmt.Sprintf("%.2f", float64(g.GameDuration)/60)
-	if g.Participants[userIndex].Stats.Win == false {
-		gd.GameResult = "Lose"
-	} else {
-		gd.GameResult = "Win"
+	if userId == -1 {
+		log.Println("ERROR GetGameData error: didnt found User dispaly name in game data")
+		return GameData{}
 	}
-	gd.UserChampionID = fmt.Sprintf("%d", g.Participants[userIndex].ChampionId)
-	gd.UserChampionIcon = fmt.Sprintf("%s/%d.png", championIcons, g.Participants[userIndex].ChampionId)
 
-	gd.ItemIcon0 = fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userIndex].Stats.Item0)
-	gd.ItemIcon1 = fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userIndex].Stats.Item1)
-	gd.ItemIcon2 = fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userIndex].Stats.Item2)
-	gd.ItemIcon3 = fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userIndex].Stats.Item3)
-	gd.ItemIcon4 = fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userIndex].Stats.Item4)
-	gd.ItemIcon5 = fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userIndex].Stats.Item5)
-	gd.ItemIcon6 = fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userIndex].Stats.Item6)
+	gd := GameData{}
+	gd.UserInedx = userId
+	gd.UserNickName = s.DisplayName
+	gd.UserChampionID = fmt.Sprintf("%d", g.Participants[userId].ChampionId)
+	gd.UserChampionIcon = fmt.Sprintf("%s/%d.png", championIcons, g.Participants[userId].ChampionId)
+	gd.UserKDA = fmt.Sprintf("%d / %d / %d", g.Participants[userId].Stats.Kills, g.Participants[userId].Stats.Deaths, g.Participants[userId].Stats.Assists)
+	gd.UserRatio = fmt.Sprintf("%.2f KDA", (float64(g.Participants[userId].Stats.Kills)+float64(g.Participants[userId].Stats.Assists))/float64(g.Participants[userId].Stats.Deaths))
+	gd.ItemsIcons = append(gd.ItemsIcons, fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userId].Stats.Item0))
+	gd.ItemsIcons = append(gd.ItemsIcons, fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userId].Stats.Item1))
+	gd.ItemsIcons = append(gd.ItemsIcons, fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userId].Stats.Item2))
+	gd.ItemsIcons = append(gd.ItemsIcons, fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userId].Stats.Item3))
+	gd.ItemsIcons = append(gd.ItemsIcons, fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userId].Stats.Item4))
+	gd.ItemsIcons = append(gd.ItemsIcons, fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userId].Stats.Item5))
+	gd.ItemsIcons = append(gd.ItemsIcons, fmt.Sprintf("%s/%d.png", itemsIcons, g.Participants[userId].Stats.Item6))
+	gd.SummonerSpell1Icon = fmt.Sprintf("%s/%d.png", summonerIcons, g.Participants[userId].Spell1Id)
+	gd.SummonerSpell2Icon = fmt.Sprintf("%s/%d.png", summonerIcons, g.Participants[userId].Spell2Id)
+	gd.Perk0Icon = fmt.Sprintf("%s/%d.png", perkIcons, g.Participants[userId].Stats.Perk0)
+	gd.PerkSubStyleIcon = fmt.Sprintf("%s/%d.png", perkIcons, g.Participants[userId].Stats.PerkSubStyle)
+	gd.NumberOfPlayer = len(g.Participants)
+	gd.GameDuration = fmt.Sprintf("%dm %ds", int(g.GameDuration)/60, int(g.GameDuration)%60)
+
+	gd.GameType = gameType[g.QueueId]
+	if gd.GameType == "" {
+		gd.GameType = "Unknown"
+	}
+
+	if g.Participants[userId].Stats.Win == false {
+		gd.GameResult = "VICTORY"
+	} else {
+		gd.GameResult = "DEFEAT"
+	}
+
+	userratio := (float64(g.Participants[userId].Stats.Kills) + float64(g.Participants[userId].Stats.Assists)) / float64(g.Participants[userId].Stats.Deaths)
+	if userratio >= 4.5 {
+		gd.UserKDASuperior = true
+	} else if userratio >= 2.5 {
+		gd.UserKDAGood = true
+	} else if userratio >= 1.5 {
+		gd.UserKDANormal = true
+	} else if g.Participants[userId].Stats.Deaths == 0 {
+		gd.UserKDANormal = true
+	} else {
+		gd.UserKDABad = true
+	}
+
+	currentTime := time.Now()
+	timeElapsed := currentTime.Sub(g.GameCreationDate)
+	if timeElapsed.Hours() > 24 {
+		gd.TimeSince = fmt.Sprintf("%d days ago", int(timeElapsed.Hours()/24))
+	} else if timeElapsed.Hours() >= 1 {
+		gd.TimeSince = fmt.Sprintf("%d hours ago", int(timeElapsed.Hours()))
+	} else {
+		gd.TimeSince = fmt.Sprintf("%d minutes ago", int(timeElapsed.Minutes()))
+	}
+
+	for i, participant := range g.Participants {
+		p := Player{
+			Nickname:     g.ParticipantIdentities[i].Player.SummonerName,                  // Replace with the appropriate field from your data
+			ChampionIcon: fmt.Sprintf("%s/%d.png", championIcons, participant.ChampionId), // Replace with the appropriate field from your data
+		}
+		if g.Teams[0].TeamId == participant.TeamId {
+			gd.Team1 = append(gd.Team1, p)
+		} else {
+			gd.Team2 = append(gd.Team2, p)
+		}
+	}
+
+	return gd
+}
+func (ds *DataService) GetMatchHistoryData(mh datatypes.MatchHistory, s datatypes.Summoner) {
+	mhd := &ds.MatchHistorydata
+	mhd.UserNickName = s.DisplayName
+	mhd.MatchHistory = mh
+	for i := 0; i < mhd.MatchHistory.Games.GameCount; i++ {
+		mhd.Gamedata = append(mhd.Gamedata, ds.GetGameData(mh.Games.Game[i], s))
+	}
 }

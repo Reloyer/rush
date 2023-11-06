@@ -1,5 +1,7 @@
 package datatypes
 
+import "time"
+
 type MatchHistory struct {
 	AccountID  int    `json:"accountId"`
 	Games      Games  `json:"games"`
@@ -17,7 +19,7 @@ type Games struct {
 
 type Game struct {
 	GameCreation          int                   `json:"gameCreation"`
-	GameCreationDate      string                `json:"gameCreationDate"`
+	GameCreationDate      time.Time             `json:"gameCreationDate"`
 	GameDuration          int                   `json:"gameDuration"`
 	GameId                int                   `json:"gameId"`
 	GameMode              string                `json:"gameMode"`

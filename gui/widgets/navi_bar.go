@@ -1,27 +1,27 @@
 package widgets
 
 import (
+	"github.com/Reloyer/rush/dataservice"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
 // CreateNavBar creates a navigation bar.
-func CreateNavBar(window *gtk.ApplicationWindow, showHomePage func(), showSettingsPage func()) {
+func CreateNavBar(w *gtk.ApplicationWindow, ds *dataservice.DataService, showHomePage func(*gtk.ApplicationWindow, *dataservice.DataService), showMatchHistoryPage func(*gtk.ApplicationWindow, *dataservice.DataService)) {
 	headerBar := gtk.NewHeaderBar()
-
 	homePageButton := gtk.NewButton()
 	homePageButton.SetLabel("Home Page")
 	homePageButton.Connect("clicked", func() {
-		showHomePage() // Call function to switch to page 1
+		showHomePage(w, ds) // Call function to switch to page HomePage
 	})
 
-	settingsPageButton := gtk.NewButton()
-	settingsPageButton.SetLabel("Page 2")
-	settingsPageButton.Connect("clicked", func() {
-		showSettingsPage() // Call function to switch to page 2
+	matchHistoryPageButton := gtk.NewButton()
+	matchHistoryPageButton.SetLabel("MatchHistory")
+	matchHistoryPageButton.Connect("clicked", func() {
+		showMatchHistoryPage(w, ds) // Call function to switch to MatchHistoryPage
 	})
 
 	headerBar.PackStart(homePageButton)
-	headerBar.PackStart(settingsPageButton)
+	headerBar.PackStart(matchHistoryPageButton)
 
-	window.SetTitlebar(headerBar)
+	w.SetTitlebar(headerBar)
 }

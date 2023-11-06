@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/Reloyer/rush/dataservice"
 	"github.com/Reloyer/rush/gui"
@@ -14,7 +14,7 @@ import (
 
 func main() {
 
-	lockfile, err := lcu.NewLockfile("/home/Reloyer/Games/wine/prefix/drive_c/Riot Games/League of Legends/lockfile")
+	lockfile, err := lcu.NewLockfile("/home/Reloyer/Games/league-of-legends/wine/prefix/drive_c/Riot Games/League of Legends/lockfile")
 	if err != nil {
 		log.Println(err)
 	}
@@ -29,19 +29,34 @@ func main() {
 	if err != nil {
 		log.Fatal("Error getting current summoner:", err)
 	}
-	userMatches, err := lcu.GetCurrentSummonerMatches(lockfile.Url(), lockfile.TokenEncoded(), 0, 10)
+	matchHistory, err := lcu.GetCurrentSummonerMatchHistory(lockfile.Url(), lockfile.TokenEncoded(), 0, 20)
 
-	log.Println(userMatches.Games.Game[0].Participants[0].Stats.Item0)
+	var wg sync.WaitGroup
+	for i := 0; i < len(matchHistory.Games.Game); i++ {
+		wg.Add(1)
+		i := i
+		go func() {
+			temp, err := lcu.GetGame(lockfile.Url(), lockfile.TokenEncoded(), matchHistory.Games.Game[i].GameId)
+			if err == nil {
+				matchHistory.Games.Game[i].ParticipantIdentities = temp.ParticipantIdentities
+				matchHistory.Games.Game[i].Participants = temp.Participants
+				matchHistory.Games.Game[i].Teams = temp.Teams
+			}
+
+			log.Println(i, len(matchHistory.Games.Game[i].Participants))
+			defer wg.Done()
+		}()
+	}
+	wg.Wait()
 	ds := dataservice.NewDataService()
 	ds.GetHomePageData(userSummonerInfo, userRankedStats)
-	ds.GetGameData(userMatches.Games.Game[4], userSummonerInfo)
-
-	fmt.Println(string([]byte(ds.Gamedata.GameDate)))
+	log.Println("Got Home Page Data")
+	ds.GetMatchHistoryData(matchHistory, userSummonerInfo)
+	log.Println("Match History Page data")
 	app := gtk.NewApplication("com.github.Reloyer.rush", gio.ApplicationFlagsNone)
 	app.ConnectActivate((func() { gui.Activite(app, ds) }))
 
 	if code := app.Run(os.Args); code > 0 {
 		os.Exit(code)
 	}
-
 }
