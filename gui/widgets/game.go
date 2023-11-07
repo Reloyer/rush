@@ -26,7 +26,7 @@ func NewGame(gd dataservice.GameData) *gtk.Box {
 	b_gameInfo.Append(l_gameResult)
 	b_gameInfo.Append(l_gameSince)
 	b_gameInfo.Append(l_gameDuration)
-
+	b_gameInfo.AddCSSClass("box-game-info")
 	b_userOverview := gtk.NewBox(gtk.OrientationVertical, 2)
 
 	b_userInfo := gtk.NewBox(gtk.OrientationHorizontal, 2)

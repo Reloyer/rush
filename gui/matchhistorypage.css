@@ -27,12 +27,14 @@ window {
 	outline-style: solid;
 	outline-color: black;
 }
-.gamebox{
-	outline-style: solid;
-	outline-color: black;
-}
 .item{
 	outline-style: none;
+}
+.gamebox{
+	border-radius: 25px;
+	padding: 20px;
+	outline-style: solid;
+	outline-color: black;
 }
 .gamebox-won{
 	background-color: #4AA96C;
